@@ -1,153 +1,172 @@
-# Stellar Micro Crowdfunding dApp
+# 🟠 Stellar Orange Belt - Micro Crowdfunding dApp
 
-## Description
-Stellar Micro Crowdfunding is a production-style mini-dApp on Stellar Testnet.  
-Users connect a Freighter wallet, submit donations through a Soroban smart contract, and track campaign progress in a polished web UI.
+## 🚀 Overview
 
-## Tech Stack
-- Soroban smart contract (`Rust`)
-- Next.js App Router (`TypeScript`)
-- TailwindCSS
-- Freighter wallet integration
-- React Query for caching
-- Contract tests (`cargo test`)
-- Frontend tests (`Vitest` + `Testing Library`)
+Stellar Orange Belt is a premium, high-fidelity micro-crowdfunding dApp built on the Stellar Testnet. It demonstrates a full-stack Soroban integration with a modern, glassmorphic UI, multi-wallet support, and robust smart contract logic.
 
-## Features
-- Wallet connect flow (Freighter)
-- Donate on-chain with Soroban contract call
-- Campaign total and goal progress bar
-- Donation event emission in contract
-- Loading, pending, success, and error UX states
-- Disabled actions during transaction signing/submission
-- Transaction hash link to Stellar Expert
-- Cached campaign reads with invalidation after donation
+---
 
-## Setup Instructions (Step-by-Step)
+## ✨ Features
 
-### Step 1: Prerequisites
-Install the following tools:
-- `Node.js` 20+
-- `pnpm` 9+
-- `Rust` + `cargo`
-- Soroban CLI (for contract build/deploy)
-- Freighter wallet browser extension
+* **Premium UI Overhaul**: Futuristic "Orange Belt" aesthetic with glassmorphism, solar gradients, and smooth Framer Motion animations.
+* **Multi-Wallet Support**: Integrated via `Stellar Wallets Kit` (Freighter, Albedo, xBull, Hana).
+* **On-Chain Crowdfunding**: Powered by a Soroban smart contract with real-time state tracking.
+* **Interactive Dashboard**: Shimmer-effect progress bars, real-time donation updates, and transaction explorer links.
+* **Robust Security**: Checked arithmetic and authorization guards in the smart contract.
 
-### Step 2: Install dependencies
-From the project root:
+---
 
-```bash
-pnpm install --dir frontend
-```
+## 🛠️ Tech Stack
 
-Rust dependencies are resolved automatically when running `cargo build` / `cargo test`.
+* **Smart Contract**: Rust + Soroban SDK
+* **Frontend**: Next.js 16 (App Router), TypeScript, Tailwind CSS 4
+* **State Management**: React Query (TanStack)
+* **Animations**: Framer Motion
+* **Icons**: Lucide React
+* **Wallet Connection**: @creit.tech/stellar-wallets-kit
 
-### Step 3: Configure environment variables
-Copy the template and edit values:
+---
 
-```bash
-cp .env.example frontend/.env.local
-```
+## 🌐 Live Demo
 
-Set at minimum:
-- `NEXT_PUBLIC_CONTRACT_ID` (after contract deployment)
-- `NEXT_PUBLIC_SOROBAN_RPC_URL`
-- `NEXT_PUBLIC_HORIZON_URL`
-- `NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE`
-- `NEXT_PUBLIC_CAMPAIGN_GOAL`
+👉 [https://stellar-orange-belt-nine.vercel.app/](https://stellar-orange-belt-nine.vercel.app/)
 
-### Step 4: Run the frontend locally
+---
 
-```bash
-pnpm --dir frontend dev
-```
+## 🎥 Demo Video (1 Minute)
 
-Open: `http://localhost:3000`
+👉 [https://youtu.be/lwT8X_11zT8](https://youtu.be/lwT8X_11zT8)
 
-### Step 5: Connect wallet and interact
-1. Open Freighter and switch to **Testnet**
-2. Click **Connect Freighter** in the app
-3. Enter donation amount
-4. Click **Donate**
-5. Sign transaction in Freighter
-6. Confirm updated total/progress and tx explorer link
+---
 
-## Smart Contract
-Contract source: `contracts/src/lib.rs`
+## 🧪 Requirements Check
 
-### Functions
-- `initialize(owner, goal)`  
-  Initializes campaign owner, goal, total (`0`), donor map, and initialization flag.
-- `donate(donor, amount)`  
-  Requires donor auth, validates positive amount, performs checked math, updates state, emits donation event.
-- `total_raised()`  
-  Returns cumulative donated amount.
-- `campaign_goal()`  
-  Returns configured campaign goal.
-- `donor_total(donor)`  
-  Returns total donated by a specific donor.
+* [x] **Mini-dApp fully functional**: Redesigned UI, functional donation flow, and multi-wallet integration.
+* [x] **3+ Tests Passing**: Verified with `cargo test` (3 contract tests passing).
+* [x] **3+ Meaningful Commits**: Structured into logical phases (UI, Wallet, Build Fixes).
+* [x] **README Complete**: Documentation of features, setup, deployment, and demo.
 
-### Data Model
-- `Initialized`: campaign guard flag
-- `Owner`: campaign owner address
-- `Goal`: target fundraising amount
-- `Total`: total raised amount
-- `Donors`: map of `Address -> i128`
+---
 
-## Tests
+## 🏃 Setup Instructions
 
-### Run smart contract tests
+### 1. Prerequisites
+
+* Node.js 20+
+* pnpm 10+
+* Rust + cargo
+* Soroban CLI
+
+### 2. Install Dependencies
 
 ```bash
-cargo test --manifest-path contracts/Cargo.toml
+pnpm install
 ```
 
-### Run frontend tests
+---
+
+### 3. Environment Configuration
+
+Copy the root `.env` to `frontend/.env` and update your Contract ID:
 
 ```bash
-pnpm --dir frontend test
+cp .env frontend/.env
 ```
 
-### Optional production build check
+Update:
 
 ```bash
-pnpm --dir frontend build
+NEXT_PUBLIC_CONTRACT_ID
 ```
 
-### Screenshot placeholder
-Add your test run screenshot at:
+---
 
-`docs/test-results-screenshot.png`
+### 4. Run Development Server
 
-## Deployment
+```bash
+pnpm run dev
+```
 
-### A) Deploy the smart contract (Stellar Testnet)
-1. Build contract WASM from `contracts/`
-2. Deploy contract using Soroban CLI to Testnet
-3. Save deployed contract ID
-4. Set `NEXT_PUBLIC_CONTRACT_ID` in `frontend/.env.local`
+Open:
 
-### B) Deploy the frontend (Vercel or Netlify)
-1. Import repository into your hosting provider
-2. Set project root to `frontend`
-3. Add env vars from `.env.example`
-4. Deploy
-5. Verify wallet connect and donation flow in production
+```
+http://localhost:3000
+```
 
-## Live Demo
-- Live URL: `https://YOUR-DEPLOYED-URL`
+---
 
-## Demo Video
-- Video link: `https://YOUR-DEMO-VIDEO-LINK`
+## 🏗️ Smart Contract & Testing
 
-## Demo Script (1 Minute)
-1. **Intro (0:00-0:10):**  
-   “This is Stellar Micro Crowdfunding, a Soroban dApp on Stellar Testnet.”
-2. **Connect wallet (0:10-0:20):**  
-   Click **Connect Freighter** and show connected address.
-3. **Make donation (0:20-0:35):**  
-   Enter amount, click **Donate**, sign transaction in Freighter.
-4. **Show state update (0:35-0:50):**  
-   Show updated total raised, progress bar, and tx hash link.
-5. **Show tests (0:50-1:00):**  
-   Run contract and frontend tests in terminal.
+### Run Contract Tests
+
+```bash
+cd contracts
+cargo test
+```
+
+**Results:**
+
+* donate_success_updates_total ... ok
+* multiple_donors_accumulate_state ... ok
+* reject_invalid_donation_amount ... ok
+
+---
+
+### Build Contract
+
+```bash
+cd contracts
+stellar contract build
+```
+
+---
+
+## 🚀 Deployment Guide
+
+### A. Deploy Smart Contract
+
+```bash
+stellar contract deploy \
+  --wasm target/wasm32v1-none/release/micro_crowdfunding.wasm \
+  --source deployer \
+  --network testnet
+```
+
+---
+
+### B. Initialize Campaign
+
+```bash
+stellar contract invoke \
+  --id <YOUR_CONTRACT_ID> \
+  --source deployer \
+  --network testnet \
+  -- initialize --owner deployer --goal 1000
+```
+
+---
+
+## 🎬 Demo Flow (1 Minute Video)
+
+1. **Intro (0–10s)**
+   Stellar Orange Belt overview
+
+2. **Wallet Connect (10–20s)**
+   Multi-wallet connection (Freighter / Albedo / xBull / Hana)
+
+3. **Donation Flow (20–40s)**
+   Execute donation and sign transaction
+
+4. **UI Update (40–50s)**
+   Progress bar updates + transaction confirmation
+
+5. **Validation (50–60s)**
+   Show Rust tests passing
+
+---
+
+## 📄 Notes
+
+This project was built as part of a Stellar Soroban bootcamp submission demonstrating end-to-end dApp development, including smart contracts, frontend integration, testing, and deployment.
+
+---
