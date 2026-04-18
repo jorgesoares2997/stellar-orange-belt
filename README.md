@@ -26,6 +26,8 @@ Stellar Orange Belt is a premium, high-fidelity micro-crowdfunding dApp built on
 * **Wallet Connection**: @creit.tech/stellar-wallets-kit
 
 ---
+## 🌐 Screenshot with test output
+👉 [Test output](docs/test-results.png)
 
 ## 🌐 Live Demo
 
