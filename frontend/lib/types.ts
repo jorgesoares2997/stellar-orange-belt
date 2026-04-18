@@ -2,7 +2,7 @@ export type Donation = {
   donor: string;
   amount: number;
   txHash: string;
-  createdAt: string;
+  createdAt?: string;
 };
 
 export type CampaignState = {

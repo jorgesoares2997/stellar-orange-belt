@@ -20,18 +20,22 @@ import { config } from "@/lib/config";
 import type { CampaignState, Donation } from "@/lib/types";
 import { fallbackCampaignState } from "@/lib/mock-data";
 
-// Initialize the multi-wallet kit using the static API of version 2.x
-// Wrap in a browser check to prevent SSR errors during Next.js build
-if (typeof window !== "undefined") {
-  StellarWalletsKit.init({
-    network: config.networkPassphrase as Networks,
-    modules: [
-      new FreighterModule(),
-      new AlbedoModule(),
-      new xBullModule(),
-      new HanaModule(),
-    ],
-  });
+// Singleton-like initialization for the wallet kit
+let kitInitialized = false;
+
+function ensureKit() {
+  if (typeof window !== "undefined" && !kitInitialized) {
+    StellarWalletsKit.init({
+      network: config.networkPassphrase as Networks,
+      modules: [
+        new FreighterModule(),
+        new AlbedoModule(),
+        new xBullModule(),
+        new HanaModule(),
+      ],
+    });
+    kitInitialized = true;
+  }
 }
 
 const server = new rpc.Server(config.rpcUrl, { allowHttp: false });
@@ -44,6 +48,7 @@ function getContract(): Contract {
 }
 
 export async function ensureWalletConnection(): Promise<string> {
+  ensureKit();
   const { address } = await StellarWalletsKit.authModal();
   return address;
 }
@@ -60,10 +65,45 @@ export async function getCampaignState(): Promise<CampaignState> {
     const goal = Number(scValToNative(extractRetval(goalResp)));
     const totalRaised = Number(scValToNative(extractRetval(totalResp)));
 
-    const recentDonations: Donation[] = [];
+    // Fetch recent events to populate the activity log
+    const recentDonations = await fetchRecentDonations();
+
     return { goal, totalRaised, recentDonations };
-  } catch (_error) {
+  } catch (error) {
+    console.error("Error fetching campaign state:", error);
     return fallbackCampaignState;
+  }
+}
+
+async function fetchRecentDonations(): Promise<Donation[]> {
+  try {
+    const latestLedger = await server.getLatestLedger();
+    const events = await server.getEvents({
+      startLedger: latestLedger.sequence - 10000, // Look back ~10k ledgers
+      filters: [
+        {
+          type: "contract",
+          contractIds: [config.contractId],
+        },
+      ],
+      limit: 10,
+    });
+
+    return events.events
+      .filter(e => scValToNative(e.topic[0]) === "donate")
+      .map(e => {
+        const amount = Number(scValToNative(e.value).amount);
+        const donor = scValToNative(e.topic[1]);
+        return {
+          donor,
+          amount,
+          txHash: e.txHash,
+        };
+      })
+      .reverse();
+  } catch (error) {
+    console.warn("Failed to fetch events:", error);
+    return [];
   }
 }
 
@@ -95,6 +135,7 @@ function buildReadTx(method: string, args: xdr.ScVal[]) {
 }
 
 export async function donate(address: string, amount: number): Promise<{ txHash: string }> {
+  ensureKit();
   if (!config.contractId) {
     throw new Error("NEXT_PUBLIC_CONTRACT_ID is required for on-chain donations.");
   }
@@ -122,7 +163,6 @@ export async function donate(address: string, amount: number): Promise<{ txHash:
 
   tx = rpc.assembleTransaction(tx, simulated).build();
 
-  // Use the static signTransaction method
   const { signedTxXdr } = await StellarWalletsKit.signTransaction(tx.toXDR(), {
     networkPassphrase: config.networkPassphrase,
     address,
